@@ -136,7 +136,7 @@ class PLA:
 
 	def erro(self, X, y):
 		tol=self.tol #tolerancia
-		n=-2*X*math.SecH(V)*errTot/len(X) #learning rate
+		n=-2*X*(1/np.cosh(V))*errTot/len(X) #learning rate
 
 		ytgh=math.TanH(V) #Funcao de Erro
 
@@ -148,7 +148,7 @@ class PLA:
 			varErr=abs(errTot-errAnterior)
 			errAnterior=errTot
 
-			gradErr=-2*X*math.SecH(V)*errTot #Gradiente do erro
+			gradErr=-2*X*(1/np.cosh(V))*errTot #Gradiente do erro
 			self.W=self.W-n*gradErr #Ajustando W com o learning rate
 
 			self.V=np.dot(self.W, X[i,:])+self.B #Atualiza V em funcao de W
@@ -157,6 +157,9 @@ class PLA:
 			errTot=(y-ytgh)**2
 
 
+
+		
+			
 if __name__ == '__main__':
 	test=PLA()
 	test.fit(X, y)
