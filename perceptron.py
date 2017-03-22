@@ -1,6 +1,5 @@
 #%matplotlib inline
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -110,6 +109,7 @@ class PLA:
 			i+=1
 	
 		self.W=W
+		self.V=V
 		self.B=b
 
 	def predict(self, X):
@@ -136,24 +136,25 @@ class PLA:
 
 	def erro(self, X, y):
 		tol=self.tol #tolerancia
-		n=-2*X*(1/np.cosh(V))*errTot/len(X) #learning rate
 
-		ytgh=math.TanH(V) #Funcao de Erro
+		ytgh=np.tanh(self.V) #Funcao de Erro
 
-		errAnterior=10000
+		errAnterior=10000 #Valor arbitrario
 		errTot=(y-ytgh)**2 #Erro inicial
-		varErr=1000 #Variancia do erro inicial
+		varErr=1000 #Chute para variancia do erro inicial
+
+		n=-2*X*(1/np.cosh(self.V))*errTot/len(X) #learning rate
 
 		while varErr>tol:
 			varErr=abs(errTot-errAnterior)
 			errAnterior=errTot
 
-			gradErr=-2*X*(1/np.cosh(V))*errTot #Gradiente do erro
+			gradErr=-2*X*(1/np.cosh(self.V))*errTot #Gradiente do erro
 			self.W=self.W-n*gradErr #Ajustando W com o learning rate
 
 			self.V=np.dot(self.W, X[i,:])+self.B #Atualiza V em funcao de W
 
-			ytgh=math.TanH(V)
+			ytgh=np.tanh(self.V)
 			errTot=(y-ytgh)**2
 
 
