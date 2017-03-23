@@ -86,7 +86,7 @@ w = np.array([ 0.47542968,  0.86705391,  1.43545253] )
 b = -6.10673197214e-12
 
 #plot_plane_and_points(data[0], data[1], w, b)
-plt.show()
+#plt.show()
 
 
 class PLA: #--Perceptron Learning Algorithm--#
@@ -96,6 +96,7 @@ class PLA: #--Perceptron Learning Algorithm--#
 		#self.V=np.zeros(1)
 		self.B=0 #Bias
 		self.tol=0.001 #Tolerancia
+		self.eta=0.01 #Learning Rate inicial
 
 	def fit(self, X, y):
 		(N, D)=X.shape
@@ -140,25 +141,26 @@ class PLA: #--Perceptron Learning Algorithm--#
 		return cnt/len(y)
 
 	def erro(self, X, y):
-		ytgh=np.tanh(np.dot(self.W, X)+self.B) #Funcao de Erro
-
+		ytgh=np.tanh(np.dot(self.W, X.T)+self.B) #Funcao de Erro
+		
 		errAnterior=10000 #Valor arbitrario
-		errTot=(y-ytgh)**2 #Erro inicial
+		errTot=np.linalg.norm((y-ytgh)) #Erro inicial
 		varErr=1000 #Chute para variancia do erro inicial
 
-		n=-2*np.dot(X, (1/np.cosh(np.dot(self.W, X)+self.B)**2)*(errTot/len(X))) #Learning Rate
+		temp=np.cosh(np.dot(self.W, X.T)+self.B)**(-2) #Secante hiperbolica ao quadrado
+		#n=-2*np.dot(temp, X)*(errTot*self.eta/len(X)) #Learning Rate
 
 		while varErr>self.tol:
-			varErr=abs(errTot-errAnterior)
-			errAnterior=errTot
+			varErr=abs(errTot**2-errAnterior)
+			errAnterior=errTot**2
 
-			gradErr=-2*X*(1/np.cosh(np.dot(self.W, X)+self.B))*errTot #Gradiente do erro
-			self.W=self.W-n*gradErr #Ajustando W com o learning rate
+			gradErr=-2*np.dot(temp, X)*errTot #Gradiente do erro
+			self.W=self.W-self.eta*gradErr #Ajustando W com o learning rate
 
 			#self.V=np.dot(self.W, X[i,:])+self.B #Atualiza V em funcao de W
 
-			ytgh=np.tanh(np.dot(self.W, X)+self.B) #Atualiza a funcao de erro
-			errTot=(y-ytgh)**2 #Atualiza o erro total
+			ytgh=np.tanh(np.dot(self.W, X.T)+self.B) #Atualiza a funcao de erro
+			errTot=np.linalg.norm((y-ytgh)) #Atualiza o erro total
 
 
 
@@ -169,7 +171,10 @@ if __name__ == '__main__':
 	test.fit(X, y)
 	test.erro(X, y)
 
+	plot_plane_and_points(data[0], data[1], test.W, test.B)
+	plt.show()
+
 	print('X='+ str(X))
-	print('W='+ str(W))
-	print('b='+ str(B))
+	print('W='+ str(test.W))
+	print('b='+ str(test.B))
 
