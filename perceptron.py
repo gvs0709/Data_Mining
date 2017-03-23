@@ -1,6 +1,6 @@
 #------------------------------------------------------#
-#NOME:  Gabriel Villares Silveira	DRE: 114089936     #
-#		Mauricio Miranda
+# Gabriel Villares Silveira	 114089936			       #
+# Mauricio Miranda			 113049797	   			   #
 #------------------------------------------------------#
 
 #%matplotlib inline
@@ -140,26 +140,24 @@ class PLA: #--Perceptron Learning Algorithm--#
 		return cnt/len(y)
 
 	def erro(self, X, y):
-		tol=self.tol
-
-		ytgh=np.tanh(np.dot(self.W.T, X)+self.B) #Funcao de Erro
+		ytgh=np.tanh(np.dot(self.W, X)+self.B) #Funcao de Erro
 
 		errAnterior=10000 #Valor arbitrario
 		errTot=(y-ytgh)**2 #Erro inicial
 		varErr=1000 #Chute para variancia do erro inicial
 
-		n=-2*np.dot(X, (1/np.cosh(np.dot(self.W.T, X)+self.B)**2)*(errTot/len(X)) #Learning Rate
+		n=-2*np.dot(X, (1/np.cosh(np.dot(self.W, X)+self.B)**2)*(errTot/len(X))) #Learning Rate
 
-		while (varErr>tol):
+		while varErr>self.tol:
 			varErr=abs(errTot-errAnterior)
 			errAnterior=errTot
 
-			gradErr=-2*X*(1/np.cosh(np.dot(self.W.T, X)+self.B))*errTot #Gradiente do erro
+			gradErr=-2*X*(1/np.cosh(np.dot(self.W, X)+self.B))*errTot #Gradiente do erro
 			self.W=self.W-n*gradErr #Ajustando W com o learning rate
 
 			#self.V=np.dot(self.W, X[i,:])+self.B #Atualiza V em funcao de W
 
-			ytgh=np.tanh(np.dot(self.W.T, X)+self.B) #Atualiza a funcao de erro
+			ytgh=np.tanh(np.dot(self.W, X)+self.B) #Atualiza a funcao de erro
 			errTot=(y-ytgh)**2 #Atualiza o erro total
 
 
