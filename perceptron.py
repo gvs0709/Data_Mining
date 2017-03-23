@@ -96,7 +96,7 @@ class PLA: #--Perceptron Learning Algorithm--#
 		#self.V=np.zeros(1)
 		self.B=0 #Bias
 		self.tol=0.001 #Tolerancia
-		self.eta=0.01 #Learning Rate inicial
+		self.eta=0.1 #Learning Rate inicial
 
 	def fit(self, X, y):
 		(N, D)=X.shape
