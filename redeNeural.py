@@ -26,10 +26,11 @@ np.random.seed(1) #The seed for the random generator is set so that it will retu
 #Note that there is no bias term feeding the output layer in this example. The weights are initially generated randomly because optimization tends not to work well when all the weights start at the same value.
 
 #synapses
-hidden_nodes(0)=2*np.random.random((3,4))-1  # 3x4 matrix of weights ((2 inputs + 1 bias) x 4 nodes in the hidden layer)
-hidden_nodes(1)=2*np.random.random((4,1))-1  # 4x1 matrix of weights. (4 nodes x 1 output) - no bias term in the hidden layer.
+hidden_nodes[0]=2*np.random.random((3,4))-1  # 3x4 matrix of weights ((2 inputs + 1 bias) x 4 nodes in the hidden layer)
+hidden_nodes[1]=2*np.random.random((4,1))-1  # 4x1 matrix of weights. (4 nodes x 1 output) - no bias term in the hidden layer.
 
 def nonlin(x, deriv=False): #Definition of the sigmoid function
+    if(deriv==True):
         return (x*(1-x))
     
     return 1/(1+np.exp(-x))
@@ -39,12 +40,12 @@ class RedeNeural:
     def __init__(self, eta, numrounds, hidden_nodes): #Construtor
         self.numrounds=numrounds
         '''
-        fit roda até que numrounds
-        seja alcançado
+        fit roda ate que numrounds
+        seja alcancado
         '''
         
         self.eta=0.1 #learning rate inicial
-        self.hidden_nodes=hidden_nodes #Numero de perceptrons (nós) na hidden layer
+        self.hidden_nodes=hidden_nodes #Numero de perceptrons (nos) na hidden layer
         
     def fit(self, X, y):
         pass
@@ -66,8 +67,8 @@ class RedeNeural:
             l1_delta=l1_error * nonlin(l1,deriv=True)
             
             #update weights (no learning rate term)
-            hidden_nodes(1)+=l1.T.dot(l2_delta)
-            hidden_nodes(0)+=l0.T.dot(l1_delta)
+            hidden_nodes[1]+=l1.T.dot(l2_delta)
+            hidden_nodes[0]+=l0.T.dot(l1_delta)
         
     def predict(self, X):
         pass
