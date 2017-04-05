@@ -1,3 +1,8 @@
+#------------------------------------------------------#
+# Gabriel Villares Silveira  114089936                 #
+# Mauricio Miranda           113049797                 #
+#------------------------------------------------------#
+
 import numpy as np
 
 #input data
@@ -76,3 +81,7 @@ class RedeNeural:
     def predict(self, X):
         pass
         #predict deve retornar as classes para X
+
+
+if __name__ == '__main__':
+    test=RedeNeural()
