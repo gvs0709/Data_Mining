@@ -22,7 +22,6 @@ y=np.array([[0],
 (linx, colx)=X.shape
 (liny, coly)=y.shape
 
-
 np.random.seed(1) #The seed for the random generator is set so that it will return the same random numbers each time, which is sometimes useful for debugging.
 
 #Now we intialize the weights to random values.
