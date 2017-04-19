@@ -11,7 +11,6 @@ X=np.array([[0,0,1],  #Note: The third column is for accommodating the bias term
             [1,0,1],
             [1,1,1]])
 
-
 # The output of the exclusive OR function follows. 
 
 #output data
@@ -46,23 +45,17 @@ def nonlin(x, deriv=False): #Definition of the sigmoid function
 
 class RedeNeural:
     def __init__(self, eta=0.1,numrounds=60000, hidden_nodes=col): #Construtor
-        self.numrounds=numrounds
-        '''
-        fit roda ate que numrounds
-        seja alcancado
-        '''
-        
+        self.numrounds=numrounds #fit roda ate que numrounds seja alcancado
         self.eta=eta #learning rate inicial
-        self.hidden_nodes=hidden_nodes#Numero de perceptrons (nos) na hidden layer
+        self.hidden_nodes=hidden_nodes #Numero de perceptrons (nos) na hidden layer
         
-    def fit(self, X, y):
+    def fit(self, X, y): #This is the main training loop. The output shows the evolution of the error between the model and desired. The error steadily decreases.
         global syn0
         global syn1
-        #This is the main training loop. The output shows the evolution of the error between the model and desired. The error steadily decreases. 
+        global l2
         
         for j in xrange(self.numrounds): #training step
             #Calculate forward through the network.
-            
             l0=X
             l1=nonlin(np.dot(l0, syn0))
             l2=nonlin(np.dot(l1, syn1))
@@ -79,28 +72,22 @@ class RedeNeural:
             #update weights (no learning rate term)
             syn1+=l1.T.dot(l2_delta)#*self.eta
             syn0+=l0.T.dot(l1_delta)#*self.eta
-        global l2
-    def predict(self, X):
-        pass
+        
+    def predict(self, X): #predict deve retornar as classes para X
         y_=l2
+
         for i in xrange(len(y_)):
-            if y_[i]<0.7:#saber qual a condicao de separacao
-                y_[i]=0#classe1
+            if y_[i]<0.7: #saber qual a condicao de separacao
+                y_[i]=0 #classe 1
+
             else:
-                y_[i]=1#classse2
-        print 'eu', y_
-        #predict deve retornar as classes para X
+                y_[i]=1 #classe 2
+
+        print 'y_=', y_
+        return y_
 
 
 if __name__ == '__main__':
     test=RedeNeural()
-    test.fit(X,y)
+    test.fit(X, y)
     test.predict(X)
-    
-    
-#def apredict(x*):
-#    lista=[]
-#    lista.append(x*)
-#    for i in lista:
-#        if 
-       
