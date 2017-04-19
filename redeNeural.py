@@ -56,11 +56,13 @@ class RedeNeural:
         self.hidden_nodes=hidden_nodes#Numero de perceptrons (nos) na hidden layer
         
     def fit(self, X, y):
-        pass
+        global syn0
+        global syn1
         #This is the main training loop. The output shows the evolution of the error between the model and desired. The error steadily decreases. 
         
         for j in xrange(self.numrounds): #training step
             #Calculate forward through the network.
+            
             l0=X
             l1=nonlin(np.dot(l0, syn0))
             l2=nonlin(np.dot(l1, syn1))
@@ -75,13 +77,30 @@ class RedeNeural:
             l1_delta=l1_error * nonlin(l1,deriv=True)
             
             #update weights (no learning rate term)
-            syn1+=l1.T.dot(l2_delta)
-            syn0+=l0.T.dot(l1_delta)
-        
+            syn1+=l1.T.dot(l2_delta)#*self.eta
+            syn0+=l0.T.dot(l1_delta)#*self.eta
+        global l2
     def predict(self, X):
         pass
+        y_=l2
+        for i in xrange(len(y_)):
+            if y_[i]<0.7:#saber qual a condicao de separacao
+                y_[i]=0#classe1
+            else:
+                y_[i]=1#classse2
+        print 'eu', y_
         #predict deve retornar as classes para X
 
 
 if __name__ == '__main__':
     test=RedeNeural()
+    test.fit(X,y)
+    test.predict(X)
+    
+    
+#def apredict(x*):
+#    lista=[]
+#    lista.append(x*)
+#    for i in lista:
+#        if 
+       
