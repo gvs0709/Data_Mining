@@ -12,7 +12,11 @@ X=np.array([[0,0,1],  #Note: The third column is for accommodating the bias term
             [1,1,1]])
 
 # The output of the exclusive OR function follows. 
-
+z=np.array([[0,1,1],
+           [0,0,1],
+           [1,1,1],
+           [1,0,1],
+           [0,1,1]])
 #output data
 y=np.array([[0],
              [1],
@@ -43,7 +47,7 @@ def nonlin(x, deriv=False): #Definition of the sigmoid function
 
 
 class RedeNeural:
-    def __init__(self, eta=0.1,numrounds=60000, hidden_nodes=col): #Construtor
+    def __init__(self, eta=1,numrounds=60000, hidden_nodes=col): #Construtor
         self.numrounds=numrounds #fit roda ate que numrounds seja alcancado
         self.eta=eta #learning rate inicial
         self.hidden_nodes=hidden_nodes #Numero de perceptrons (nos) na hidden layer
@@ -69,19 +73,22 @@ class RedeNeural:
             l1_delta=l1_error * nonlin(l1,deriv=True)
             
             #update weights (no learning rate term)
-            syn1+=l1.T.dot(l2_delta)#*self.eta
-            syn0+=l0.T.dot(l1_delta)#*self.eta
+            syn1+=l1.T.dot(l2_delta)*self.eta#por algum motivo o eta entre 0 e 1 só aumenta o erro, mas o eta 44 minimiza o erro, pois no 45 o error volta a aumentar
+            syn0+=l0.T.dot(l1_delta)*self.eta
+        
+        print(l2)
         
     def predict(self, X): #predict deve retornar as classes para X
-        y_=l2
-
+        #y_=l2
+        l1=nonlin(np.dot(X, syn0))
+        y_=nonlin(np.dot(l1, syn1))
+        print y_
         for i in xrange(len(y_)):
-            if y_[i]<0.7: #saber qual a condicao de separacao
+            if y_[i]<0.5:#saber qual a condicao de separacao?
                 y_[i]=0 #classe 1
 
             else:
                 y_[i]=1 #classe 2
-
         print 'y_=', y_
         return y_
 
@@ -89,4 +96,4 @@ class RedeNeural:
 if __name__ == '__main__':
     test=RedeNeural()
     test.fit(X, y)
-    test.predict(X)
+    test.predict(z)
