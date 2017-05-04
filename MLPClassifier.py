@@ -7,9 +7,9 @@ import numpy as np
 from sklearn import svm
 from sklearn import tree
 from sklearn.neural_network import MLPClassifier
+from sklearn.datasets import fetch_mldata
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.datasets import fetch_mldata
 
 mnist=fetch_mldata('MNIST original')
 
@@ -36,19 +36,17 @@ for i in xrange(amostraTeste):
 	k=np.random.randint(1, l) #Seleciona linhas aleatorias de X para teste
 	testeX[i]=X[k] #Coloca a linha selecionada na matriz de teste
 
-#print testeX
-#print X
-
-#--------------------------------------Metodos---------------------------------------------#
+#-------------------------------------Classificadores--------------------------------------#
 #clf=MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
 #clf=svm.SVC(kernel="linear")
 clf=tree.DecisionTreeClassifier()
-#----------------------------------------//------------------------------------------------#
+#------------------------------------------------------------------------------------------#
 
 clf.fit(treinoX, treinoY)
 y_pred=clf.predict(X)
 
 print accuracy_score(y, y_pred)
+print confusion_matrix(y, y_pred)
 
 
 
