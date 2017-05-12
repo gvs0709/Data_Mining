@@ -3,7 +3,6 @@
 # Mauricio Miranda			 113049797	   			   #
 #------------------------------------------------------#
 
-#%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -21,20 +20,6 @@ def generate_linear_data(w,b,n):
             y.append(-1)
             X.append(x)
     return np.array(X),y
-
-X ,y = generate_linear_data([1,-3,-2],3,10)
-
-X=np.array([[-2.81214997, -6.64093076,  0.94676252],
-       [ 4.91337228,  1.29491011,  4.56116006],
-       [ 8.18071064,  4.64529659, -5.9869538 ],
-       [-7.81506569,  2.99811495, -9.7573152 ],
-       [-6.85085531, -5.36402403,  9.15515526],
-       [ 6.02907685,  6.33088307,  8.73496787],
-       [ 1.84914425, -6.14994496,  7.99878312],
-       [ 1.83980308,  3.6167442 ,  0.67667057],
-       [-9.18944555, -5.10177485,  9.24538592]])
-
-y=[1, -1, 1, 1, -1, -1, 1, -1, -1]
 
 def plot_plane_and_points(X,y,w,b):
     fig = plt.figure()
@@ -63,23 +48,6 @@ def plot_plane_and_points(X,y,w,b):
     # plot the surface
     ax.plot_surface(xx, yy, z,alpha=0.3, color="green")
 
-def generate_linear_data(w,b,n):
-    dim = len(w)
-    y = []
-    X = []
-
-    for i in xrange(n):
-        x = np.random.uniform(-10,10,dim)
-
-        if(np.dot(w,x) + b > 5):
-            y.append(1)
-            X.append(x)
-        elif(np.dot(w,x) + b < -5):
-            y.append(-1)
-            X.append(x)
-
-    return np.array(X),y
-
 data = generate_linear_data(np.array([1,2,3]),0,1000)
 
 w = np.array([ 0.47542968,  0.86705391,  1.43545253] )
@@ -92,31 +60,31 @@ b = -6.10673197214e-12
 class PLA: #--Perceptron Learning Algorithm--#
 	
 	def __init__(self): #Construtor
-		self.W=np.zeros(1) #Vetor de pesos
-		#self.V=np.zeros(1)
 		self.B=0 #Bias
 		self.tol=0.001 #Tolerancia
 		self.eta=0.1 #Learning Rate inicial
+		self.first=True
 
 	def fit(self, X, y):
 		(N, D)=X.shape
-		W=np.random.rand(D)
-		
+
+		if self.first:
+			self.first=False
+			self.W=np.zeros(len(X[0]))
+
 		i=0
-		b=0
 
 		while i<N:
-			V=np.dot(W, X[i,:])+b #Produto Interno
+			V=np.dot(self.W, X[i])+self.B #Produto Interno
 
 			if np.sign(V)!=np.sign(y[i]):
-				W+=y[i]*X[i,:]
-				b+=y[i]
+				self.W+=y[i]*X[i]
+				self.B+=y[i]
 				i=0
-			i+=1
-	
-		self.W=W
-		#self.V=V
-		self.B=b
+
+			else:
+				i+=1
+
 
 	def predict(self, X):
 		y_=np.dot(X, self.W)
@@ -147,34 +115,38 @@ class PLA: #--Perceptron Learning Algorithm--#
 		errTot=np.linalg.norm((y-ytgh)) #Erro inicial
 		varErr=1000 #Chute para variancia do erro inicial
 
-		temp=np.cosh(np.dot(self.W, X.T)+self.B)**(-2) #Secante hiperbolica ao quadrado
-		#n=-2*np.dot(temp, X)*(errTot*self.eta/len(X)) #Learning Rate
+		temp=np.cosh(np.dot(self.W, X.T)+self.B)**(-2) #Secante hiperbolica ao quadrado (derivada de ytgh)
 
 		while varErr>self.tol:
-			varErr=abs(errTot**2-errAnterior)
-			errAnterior=errTot**2
+			erros=0
+			#varErr=abs(errTot**2-errAnterior)
+			#errAnterior=errTot**2
 
-			gradErr=-2*np.dot(temp, X)*errTot #Gradiente do erro
-			self.W=self.W-self.eta*gradErr #Ajustando W com o learning rate
+			for i in xrange(len(X)):
+				erros+=errTot
+				gradErr=-2*np.dot(temp, X)*errTot #Gradiente do erro
+				self.W=self.W-self.eta*gradErr #Ajustando W com o learning rate
 
-			#self.V=np.dot(self.W, X[i,:])+self.B #Atualiza V em funcao de W
+			#ytgh=np.tanh(np.dot(self.W, X.T)+self.B) #Atualiza a funcao de erro
+			#errTot=np.linalg.norm((y-ytgh)) #Atualiza o erro total
 
-			ytgh=np.tanh(np.dot(self.W, X.T)+self.B) #Atualiza a funcao de erro
-			errTot=np.linalg.norm((y-ytgh)) #Atualiza o erro total
+			varErr=erros-errAnterior
+			errAnterior=erros
 
 
 
 		
-			
 if __name__ == '__main__':
 	test=PLA()
-	test.fit(X, y)
-	test.erro(X, y)
+	data = generate_linear_data(np.random.uniform(-1,1,3), np.random.random(), 1000)
 
+	test.fit(data[0], data[1])
+	test.erro(data[0], data[1])
+	
 	plot_plane_and_points(data[0], data[1], test.W, test.B)
 	plt.show()
 
-	print('X='+ str(X))
-	print('W='+ str(test.W))
-	print('b='+ str(test.B))
+	#print('X='+ str(data[0]))
+	#print('W='+ str(test.W))
+	#print('b='+ str(test.B))
 
