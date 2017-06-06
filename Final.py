@@ -9,19 +9,17 @@ target=[]
 data1=[]
 data2=[]
 
-f=open("test.csv")
-#f=open("new_train.csv") 
-
-
+#f=open("test.csv")
+f=open("new_train.csv") 
 
 for line in f:
     vec=line.split(",")
-    target.append(float(vec[-1]))
+    target.append(int(vec[-1]))
     temp1=[]
     #temp2=[]
     
     for i in xrange(len( vec[:-1])):
-        vec[i]=float(vec[i])
+        vec[i]=int(vec[i])
         temp1.append(vec[i])
         
   #      try:
