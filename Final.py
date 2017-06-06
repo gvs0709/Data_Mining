@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn import tree
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
@@ -12,6 +13,7 @@ f=open("test.csv")
 #f=open("new_train.csv") 
 
 
+
 for line in f:
     vec=line.split(",")
     target.append(float(vec[-1]))
@@ -22,50 +24,51 @@ for line in f:
         vec[i]=float(vec[i])
         temp1.append(vec[i])
         
-        '''try:
-            vec[i] = float(vec[i])
-            temp1.append(vec[i])
-        except ValueError:
-            temp2.append(vec[i])'''
+  #      try:
+  #          vec[i] = float(vec[i])
+  #          temp1.append(vec[i])
+  #      except ValueError:
+  #          temp2.append(vec[i])
 
     #data2.append(temp2)
     data1.append(temp1)
+f.close()
 
 #array=np.array(data2)
 array=np.array(data1)
-print np.array(data1)
+print array
 #array=np.array(data2)
 #array=np.array(data1)
 #print array
 
-keys=[]
+#keys=[]
 
-for i in xrange(len(array.T)):
-    conjunto=set(array.T[i])
-    pos=list(conjunto)
-    keys+=pos
+#for i in xrange(len(array.T)):
+#    conjunto=set(array.T[i])
+#    pos=list(conjunto)
+#    keys+=pos
 
-dict_pos={}
+#dict_pos={}
 
-for i in xrange(len(keys)):
-    dict_pos[keys[i]]=i
+#for i in xrange(len(keys)):
+#    dict_pos[keys[i]]=i
 
 #data2_tratado=[]
-data1_tratado=[]
+#data1_tratado=[]
 
-for i in xrange(len(data1)):
+#for i in xrange(len(data1)):
 #for i in xrange(len(data2)):
-    zeros=np.zeros(len(keys))
+#    zeros=np.zeros(len(keys))
     
-    for k in data1[i]:
+#    for k in data1[i]:
     #for k in data2[i]:
-        zeros[dict_pos[k]]=1
+ #       zeros[dict_pos[k]]=1
              
     #data2_tratado.append(list(zeros))
-    data1_tratado.append(list(zeros))
+#    data1_tratado.append(list(zeros))
     
 #print np.array(data2_tratado)
-print np.array(data1_tratado)
+#print np.array(data1_tratado)
 
 #X2 = np.array(data2_tratado)
 sc=StandardScaler()
@@ -83,7 +86,7 @@ print "Baseline: ", len(y[y==1])/float(len(y))
 
 acc=[]
 
-for train_index, test_index in kf.split(X3):
+'''for train_index, test_index in kf.split(X3):
 #for train_index, test_index in kf.split(X):
     #X_train, X_test=X[train_index], X[test_index]
     X3_train, X3_test=X3[train_index], X3[test_index]
@@ -101,4 +104,4 @@ for train_index, test_index in kf.split(X3):
     
     acc.append(score)
     
-print "mean accuracy: ", np.mean(acc)
+print "mean accuracy: ", np.mean(acc) '''
