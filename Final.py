@@ -11,16 +11,24 @@ data2=[]
 
 #f=open("test.csv")
 f=open("new_train.csv") 
+f.next()
 
-for line in f:
+for i,line in enumerate(f):
+    #print(line)
+    line = line.strip()
+    print(line)
     vec=line.split(",")
-    target.append(int(vec[-1]))
-    temp1=[]
+    try:
+        target_n = int(vec[-1])
+    except:
+        continue
+    target.append(target_n)
+    #temp1=[]
     #temp2=[]
     
-    for i in xrange(len( vec[:-1])):
-        vec[i]=int(vec[i])
-        temp1.append(vec[i])
+  #  for i in xrange(len( vec[:-1])):
+  #      vec[i]=int(vec[i])
+  #      temp1.append(vec[i])
         
   #      try:
   #          vec[i] = float(vec[i])
@@ -29,12 +37,14 @@ for line in f:
   #          temp2.append(vec[i])
 
     #data2.append(temp2)
-    data1.append(temp1)
+    #data1.append(temp1)
 f.close()
 
+print(target)
+
 #array=np.array(data2)
-array=np.array(data1)
-print array
+#array=np.array(data1)
+#print array
 #array=np.array(data2)
 #array=np.array(data1)
 #print array
