@@ -5,15 +5,14 @@ from sklearn import tree
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
+from sklearn.ensemble import GradientBoostingClassifier
 import time
 
 target=[]
 data1=[]
-#data2=[]
+data2=[]
 
-#f=open("test.csv")
 f=open("new_train.csv") 
-#f.next()
 
 for line in f:
     #print(line)
@@ -41,18 +40,49 @@ for line in f:
 
     #data2.append(temp2)
     data1.append(temp1)
+    
 f.close()
 
-#print target
+g=open("test.csv")
 
-#array=np.array(data2)
+for line in g:
+    #print(line)
+    #line = line.strip()
+    #print(line)
+    vec2=line.split(",")
+
+    
+    #temp1=[]
+    temp2=[]
+    
+    for i in xrange(len( vec2[:])):
+        vec2[i]=float(vec2[i])
+        temp2.append(vec2[i])
+        
+  #      try:
+  #          vec[i] = float(vec[i])
+  #          temp1.append(vec[i])
+  #      except ValueError:
+  #          temp2.append(vec[i])
+
+    data2.append(temp2)
+    #data1.append(temp1)
+    
+g.close()
+array2=np.array(data2)
 array=np.array(data1)
-#print array
+print np.shape(array)
+#print target
+print 3*len(array)/100
+array=array[:, (array != 0).sum(axis=0) >=  3*len(array)/100]
+array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 3*len(array2)/100]
+print np.shape(array)
+print np.shape(array2)
 #array=np.array(data2)
 #array=np.array(data1)
 #print array
 
-keys=[]
+'''keys=[]
 
 for i in xrange(len(array.T)):
     conjunto=set(array.T[i])
@@ -62,7 +92,9 @@ for i in xrange(len(array.T)):
 dict_pos={}
 
 for i in xrange(len(keys)):
-    dict_pos[keys[i]]=i
+    dict_pos[keys[i]]=i'''
+    
+
 #data2_tratado=[]
 #data1_tratado=[]
 #for i in xrange(len(data1)):
@@ -78,7 +110,8 @@ for i in xrange(len(keys)):
 #print np.array(data1_tratado)
 #X2 = np.array(data2_tratado)
 sc=StandardScaler()
-X3=sc.fit_transform(data1)
+X1=sc.fit_transform(array)
+X2=sc.fit_transform(array2)
 #X = np.concatenate((X3,X2), axis=1) 
 y=np.array(target)
 #print X
@@ -87,16 +120,30 @@ y=np.array(target)
 kf=KFold(n_splits=10, shuffle=True)
 print "Baseline: ", len(y[y==1])/float(len(y))
 acc=[]
-for train_index, test_index in kf.split(X3):
+
+for train_index, test_index in kf.split(X1):
     time1=time.time()
-    X3_train, X3_test=X3[train_index], X3[test_index]
+    X1_train, X1_test=X1[train_index], X1[test_index]
     y_train, y_test=y[train_index], y[test_index]
+    
     #clf=SVC(kernel="kbf")
-    clf=tree.DecisionTreeClassifier()
-    #clf=MLPClassifier(activation='identity', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(5, 5), random_state=1)
-    clf.fit(X3_train,y_train)
-    y_pred=clf.predict(X3_test)
+    #clf=tree.DecisionTreeClassifier()
+    clf=MLPClassifier(activation='identity', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(5, 5), random_state=1)
+    #clf=GradientBoostingClassifier()
+    clf.fit(X1_train,y_train)
+    y_pred=clf.predict(X1_test)
     score=accuracy_score(y_pred, y_test) 
     acc.append(score)
+    print y_pred
     print "Demorou: ", time.time() - time1
-print "mean accuracy: ", np.mean(acc) 
+print "mean accuracy: ", np.mean(acc)
+
+
+h=open("resposta.txt","r+")
+a=clf.predict_proba(X2)
+
+for i in xrange(len(a)):
+    h.write(str(a[i, 0])+"\n" )
+
+h.truncate()
+h.close()
