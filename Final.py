@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn import tree
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import GradientBoostingClassifier
 import time
 
 target=[]
@@ -19,9 +19,11 @@ for line in f:
     #line = line.strip()
     #print(line)
     vec=line.split(",")
+    
     try:
-        target_n = int(vec[-1])
+        target_n=int(vec[-1])
         target.append(target_n)
+        
     except:
         continue
     
@@ -51,7 +53,6 @@ for line in g:
     #print(line)
     vec2=line.split(",")
 
-    
     #temp1=[]
     temp2=[]
     
@@ -69,12 +70,14 @@ for line in g:
     #data1.append(temp1)
     
 g.close()
+
 array2=np.array(data2)
 array=np.array(data1)
 print np.shape(array)
 #print target
-print 3*len(array)/100
-array=array[:, (array != 0).sum(axis=0) >=  3*len(array)/100]
+#print 3*len(array)/100
+
+array=array[:, (array!=0).sum(axis=0) >= 3*len(array)/100]
 array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 3*len(array2)/100]
 print np.shape(array)
 print np.shape(array2)
@@ -123,6 +126,7 @@ acc=[]
 
 for train_index, test_index in kf.split(X1):
     time1=time.time()
+    
     X1_train, X1_test=X1[train_index], X1[test_index]
     y_train, y_test=y[train_index], y[test_index]
     
@@ -130,12 +134,15 @@ for train_index, test_index in kf.split(X1):
     #clf=tree.DecisionTreeClassifier()
     clf=MLPClassifier(activation='identity', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(5, 5), random_state=1)
     #clf=GradientBoostingClassifier()
+    
     clf.fit(X1_train,y_train)
     y_pred=clf.predict(X1_test)
+    
     score=accuracy_score(y_pred, y_test) 
     acc.append(score)
     print y_pred
     print "Demorou: ", time.time() - time1
+    
 print "mean accuracy: ", np.mean(acc)
 
 
