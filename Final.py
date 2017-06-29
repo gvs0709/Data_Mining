@@ -4,12 +4,11 @@ from sklearn.neural_network import MLPClassifier
 from sklearn import tree
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
-#from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import GradientBoostingClassifier
 import time
-import xgboost as xgb
-
+from xgboost import XGBClassifier
 target=[]
 data1=[]
 data2=[]
@@ -79,8 +78,8 @@ print np.shape(array)
 #print target
 print 3*len(array)/100
            
-array=array[:, (array != 0).sum(axis=0) >=  3*len(array)/100]
-array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 3*len(array2)/100]
+array=array[:, (array != 0).sum(axis=0) >=  2*len(array)/100]
+array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 2*len(array2)/100]
 
 print np.shape(array)
 print np.shape(array2)
@@ -132,17 +131,17 @@ for train_index, test_index  in kf.split(X1):
     time1=time.time()
     X1_train, X1_test=X1[train_index], X1[test_index]
     y_train, y_test=y[train_index], y[test_index]
-    
     ###clf=SVC(kernel="kbf")
     #clf=tree.DecisionTreeClassifier()
-    clf=MLPClassifier(activation='identity', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(5,5), random_state=1)
+    #clf=MLPClassifier(activation='relu', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(100,), random_state=None)
     #clf=GradientBoostingClassifier()
+    clf=XGBClassifier()
     clf.fit(X1_train,y_train)
     y_pred=clf.predict(X1_test)
-    
     score=accuracy_score(y_pred, y_test)
     #score=roc_auc_score(y_pred, y_test, average='macro')
     acc.append(score)
+    print np.shape(np.array(y_pred))
     print y_pred
     print "Demorou: ", time.time() - time1
                                 
@@ -151,9 +150,9 @@ print "mean accuracy: ", np.mean(acc)
 
 h=open("resposta.txt","r+")
 a=clf.predict_proba(X2)
-
+print np.shape(np.array(a))
 for i in xrange(len(a)):
-    h.write(str(a[i, 1])+"\n" )
+    h.write(str(a[i,1])+"\n" )
 
 h.truncate()
 h.close()
