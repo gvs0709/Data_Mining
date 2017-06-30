@@ -3,12 +3,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
 from sklearn import tree
 from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
+from xgboost import XGBClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
-from sklearn.ensemble import GradientBoostingClassifier
 import time
-from xgboost import XGBClassifier
+
 target=[]
 data1=[]
 data2=[]
@@ -129,28 +130,30 @@ acc=[]
 
 for train_index, test_index  in kf.split(X1):
     time1=time.time()
+    
     X1_train, X1_test=X1[train_index], X1[test_index]
     y_train, y_test=y[train_index], y[test_index]
+    
     ###clf=SVC(kernel="kbf")
     #clf=tree.DecisionTreeClassifier()
     #clf=MLPClassifier(activation='relu', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(100,), random_state=None)
     #clf=GradientBoostingClassifier()
-    clf=XGBClassifier()
+    clf=XGBClassifier(eta=0.1, max_depth=4, min_child_weight=1, subsample=0.8, colsample_bytree=0.8, gamma=0, objective=binary:logistic, eval_metric=auc)
     clf.fit(X1_train,y_train)
     y_pred=clf.predict(X1_test)
+    
     score=accuracy_score(y_pred, y_test)
     #score=roc_auc_score(y_pred, y_test, average='macro')
     acc.append(score)
-    print np.shape(np.array(y_pred))
     print y_pred
+    
     print "Demorou: ", time.time() - time1
                                 
 print "mean accuracy: ", np.mean(acc)
 
-
 h=open("resposta.txt","r+")
 a=clf.predict_proba(X2)
-print np.shape(np.array(a))
+
 for i in xrange(len(a)):
     h.write(str(a[i,1])+"\n" )
 
