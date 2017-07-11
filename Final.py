@@ -1,30 +1,29 @@
 import time
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import xgboost as xgb
 from xgboost.sklearn import XGBClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn import tree
-from sklearn import model_selection
-from sklearn import metrics
-from sklearn.preprocessing import StandardScaler
-#from sklearn.metrics import accuracy_score
-#from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import StandardScaler, normalize
+#import matplotlib.pylab as plt
+#%matplotlib inline
+#from matplotlib.pylab import rcParams
+#rcParams['figure.figsize'] = 12, 4
 
-train=pd.read_csv('new_train.csv')
-target='TARGET'
+#train=pd.read_csv('new_train.csv')
+#target='TARGET'
 #IDcol='ID'
 
-#target=[]
-#data1=[]
-#data2=[]
+target=[]
+data1=[]
+data2=[]
 
-'''f=open("new_train.csv") 
+f=open("new_train.csv") 
 
 for line in f:
-    #print(line)
-    #line = line.strip()
-    #print(line)
     vec=line.split(",")
     
     try:
@@ -35,19 +34,11 @@ for line in f:
         continue
     
     temp1=[]
-    #temp2=[]
     
     for i in xrange(len( vec[:-1])):
         vec[i]=float(vec[i])
         temp1.append(vec[i])
-        
-  #      try:
-  #          vec[i] = float(vec[i])
-  #          temp1.append(vec[i])
-  #      except ValueError:
-  #          temp2.append(vec[i])
 
-    #data2.append(temp2)
     data1.append(temp1)
     
 f.close()
@@ -55,26 +46,14 @@ f.close()
 g=open("test.csv")
 
 for line in g:
-    #print(line)
-    #line = line.strip()
-    #print(line)
     vec2=line.split(",")
-
-    #temp1=[]
     temp2=[]
     
     for i in xrange(len( vec2[:])):
         vec2[i]=float(vec2[i])
         temp2.append(vec2[i])
-        
-  #      try:
-  #          vec[i] = float(vec[i])
-  #          temp1.append(vec[i])
-  #      except ValueError:
-  #          temp2.append(vec[i])
 
     data2.append(temp2)
-    #data1.append(temp1)
     
 g.close()
 
@@ -82,14 +61,15 @@ array2=np.array(data2)
 array=np.array(data1)
 print np.shape(array)
            
-array=array[:, (array != 0).sum(axis=0) >=  2*len(array)/100]
-array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 2*len(array2)/100]
-
+array=array[:, (array != 0).sum(axis=0) >=  14*len(array)/100]
+array=normalize(array, norm='l2', axis=0, copy='False')
 print np.shape(array)
+
+array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 14*len(array2)/100]
+array2=normalize(array2, norm='l2', axis=0, copy='False')
 print np.shape(array2)
 
 sc=StandardScaler()
-
 X1=sc.fit_transform(array)
 X2=sc.fit_transform(array2)
 y=np.array(target)
@@ -99,27 +79,32 @@ kf=KFold(n_splits=10, shuffle=True)
 print "Baseline: ", len(y[y==1])/float(len(y))
 acc=[]
 
+#melhor=[0, 0]
+
+#for i in xrange(6, 10, 1):
+
 for train_index, test_index  in kf.split(X1):
     time1=time.time()
     
     X1_train, X1_test=X1[train_index], X1[test_index]
     y_train, y_test=y[train_index], y[test_index]
     
-    #clf=tree.DecisionTreeClassifier()
-    clf=MLPClassifier(activation='relu', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(100,), random_state=None)
-    #clf=GradientBoostingClassifier()
-    #clf=XGBClassifier(learning_rate=0.1, max_depth=4, min_child_weight=1, subsample=0.8, colsample_bytree=0.8, gamma=0, objective='binary:logistic', eval_metric='auc')
+    #clf=MLPClassifier(activation='relu', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(100,), random_state=None)
+    clf=XGBClassifier(learning_rate=0.1, max_depth=5, min_child_weight=5, subsample=0.6, colsample_bytree=0.6, gamma=0.2, objective='binary:logistic', eval_metric='auc')
     clf.fit(X1_train,y_train)
-    y_pred=clf.predict(X1_test)
+    y_pred=clf.predict_proba(X1_test)
     
-    score=accuracy_score(y_pred, y_test)
-    #score=roc_auc_score(y_pred, y_test, average='macro')
+    #score=accuracy_score(y_pred, y_test)
+    score=roc_auc_score(y_test, y_pred[:, 1], average='weighted')
     acc.append(score)
-    print y_pred
+    #print y_pred
     
     print "Demorou: ", time.time() - time1
                                 
-print "mean accuracy: ", np.mean(acc)
+print "Mean roc_auc: ", np.mean(acc)
+
+    #if np.mean(acc)>melhor[1]:
+    #    melhor=[i, np.mean(acc)]
 
 h=open("resposta.txt","r+")
 a=clf.predict_proba(X2)
@@ -128,9 +113,11 @@ for i in xrange(len(a)):
     h.write(str(a[i,1])+"\n" )
 
 h.truncate()
-h.close()'''
+h.close()
 
-def modelfit(alg, dtrain, predictors,useTrainCV=True, cv_folds=5, early_stopping_rounds=50):
+#print "melhor=", melhor
+
+'''def modelfit(alg, dtrain, predictors,useTrainCV=True, cv_folds=5, early_stopping_rounds=50):
     
     if useTrainCV:
         xgb_param = alg.get_xgb_params()
@@ -182,7 +169,7 @@ gsearch1 = GridSearchCV(estimator = XGBClassifier( learning_rate =0.1, n_estimat
 gsearch1.fit(train[predictors],train[target])
 gsearch1.grid_scores_, gsearch1.best_params_, gsearch1.best_score_
 
-'''param_test2 = {
+param_test2 = {
  'max_depth':[4,5,6],
  'min_child_weight':[4,5,6]
 }
