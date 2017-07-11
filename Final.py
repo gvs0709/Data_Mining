@@ -2,6 +2,7 @@ import time
 import numpy as np
 #import pandas as pd
 import xgboost as xgb
+import numpy.matlib
 from xgboost.sklearn import XGBClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV, KFold
@@ -62,12 +63,42 @@ array=np.array(data1)
 print np.shape(array)
            
 array=array[:, (array != 0).sum(axis=0) >=  14*len(array)/100]
-array=normalize(array, norm='l2', axis=0, copy='False')
 print np.shape(array)
 
 array2=array2[:, np.apply_along_axis(np.count_nonzero, 0, array2) >= 14*len(array2)/100]
-array2=normalize(array2, norm='l2', axis=0, copy='False')
 print np.shape(array2)
+
+'''a=np.matlib.zeros((np.shape(array)[0], np.shape(array)[1]+1))
+a2=np.matlib.zeros((np.shape(array2)[0], np.shape(array2)[1]+1))
+
+for i in xrange(len(array)):
+    k=0
+
+    for j in xrange(np.shape(array)[1]):
+        if array[i, j]==0:
+            k=k+1
+
+    a[i, :-1]=array[i, :]
+    a[i, -1]=k
+
+for i in xrange(len(array2)):
+    k=0
+
+    for j in xrange(np.shape(array2)[1]):
+        if array2[i, j]==0:
+            k=k+1
+
+    a2[i, :-1]=array2[i, :]
+    a2[i, -1]=k
+
+array=a
+print np.shape(array)
+
+array2=a2
+print np.shape(array2)'''
+
+array=normalize(array, norm='l2', axis=0, copy='False')
+array2=normalize(array2, norm='l2', axis=0, copy='False')
 
 sc=StandardScaler()
 X1=sc.fit_transform(array)
@@ -81,7 +112,7 @@ acc=[]
 
 #melhor=[0, 0]
 
-#for i in xrange(6, 10, 1):
+#for i in xrange(0, 3, 1):
 
 for train_index, test_index  in kf.split(X1):
     time1=time.time()
@@ -90,7 +121,7 @@ for train_index, test_index  in kf.split(X1):
     y_train, y_test=y[train_index], y[test_index]
     
     #clf=MLPClassifier(activation='relu', solver='adam', learning_rate='constant', alpha=1e-5, hidden_layer_sizes=(100,), random_state=None)
-    clf=XGBClassifier(learning_rate=0.1, max_depth=5, min_child_weight=5, subsample=0.6, colsample_bytree=0.6, gamma=0.2, objective='binary:logistic', eval_metric='auc')
+    clf=XGBClassifier(learning_rate=0.1, max_depth=3, min_child_weight=5, subsample=0.6, colsample_bytree=0.6, gamma=0.1, scale_pos_weight=1.3, objective='binary:logistic', eval_metric='auc', n_jobs=2, random_state=27)
     clf.fit(X1_train,y_train)
     y_pred=clf.predict_proba(X1_test)
     
